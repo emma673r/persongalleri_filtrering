@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JSON</title>
+    <style>
+      section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-rows: auto;
+      }
+
+      article {
+        border: 1px ridge orange;
+        border-radius: 15px 50px;
+        padding: 10px;
+        margin: 1em;
+      }
+
+      img {
+        max-width: 200px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header><h1></h1></header>
+    <nav>
+      <button data-troende="alle" class="valgt">Alle</button>
+      <button data-troende="ja">Ja</button>
+      <button data-troende="nej">Nej</button>
+      <button data-troende="tvivler">Tvivler</button>
+    </nav>
+
+    <template>
+      <article>
+        <h2></h2>
+        <p class="efternavn"></p>
+        <img src="" alt="" />
+        <p class="email"></p>
+        <p class="troende"></p>
+      </article>
+    </template>
+    <section></section>
+    <script>
+      const container = document.querySelector("section");
+      const temp = document.querySelector("template");
+      const header = document.querySelector("header h1");
+
+      const url = "https://persongalleri-5d3e.restdb.io/rest/persongalleri";
+      const key = "600fe9211346a1524ff12e31";
+      let data = [];
+      let personer;
+      let filter = "ja";
+
+      const options = {
+        headers: {
+          "x-apikey": key,
+        },
+      };
+      document.addEventListener("DOMContentLoaded", start);
+
+      function start() {
+        hentData();
+      }
+
+      async function hentData() {
+        const respons = await fetch(url, options);
+        const personer = await respons.json();
+        vis(personer);
+      }
+
+      function vis(personliste) {
+        //løb igennem array "personliste"
+        console.log(personliste);
+        personliste.forEach((person) => {
+          const klon = temp.cloneNode(true).content;
+          klon.querySelector("h2").textContent = person.fornavn;
+          klon.querySelector(".efternavn").textContent =
+            `Efternavn: ${person.efternavn}`.toUpperCase();
+
+          klon.querySelector(".email").textContent = `Mail: ${person.email}`;
+          klon.querySelector("img").src = `/faces/${person.billede}`;
+          klon.querySelector("img").alt = person.billede;
+          klon.querySelector(
+            ".troende"
+          ).textContent = `Troende: ${person.troende}`;
+          container.appendChild(klon);
+        });
+      }
+
+      hentData();
+    </script>
+  </body>
+</html>
